@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My first quiz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+    <h1>My First Quiz Ever</h1>
+    <div class="quiz">
+        <h2 id="question">How much wood could a woodchuck chuck if a woodchuck could chuck wood?</h2>
+        <div id="answer-buttons">
+            <button class="btn">yes</button>
+            <button class="btn correct-answer">a woodchuck would chuck as much as a woodchuck could chuck if a woodchuck could chuck wood</button>
+            <button class="btn">what the hell is a woodchuck</button>
+            <button class="btn">can I go home now</button>
+        </div>
+        <button id="next-button">Next</button>
+    </div>
+</div>
+<p>Score: <span class="score-element">0</span></p>
+
+<script>
+    let myButtons = document.querySelectorAll(".btn");
+    let scoreElement = document.querySelector(".score-element");
+
+    function disableButtons() {
+        for (let button of myButtons) {
+            button.disabled = true;
+        }
+    }
+
+    function showNextButton() {
+        nextButton.style.display = "block";
+    }
+
+    function checkAnswer(event) {
+        let button = event.target;
+        let isCorrect = button.classList.contains("correct-answer");
+        button.classList.add("clicked");
+        if (isCorrect) {
+            score++;
+            scoreElement.innerText = score;
+            button.classList.add("correct");
+        } else {
+            button.classList.add("incorrect");
+        }
+        disableButtons();
+        showNextButton();
+    }
+
+    for (let button of myButtons) {
+        button.onclick = checkAnswer;
+    }
+</script>
+
+<script>
+    const questions = [
+        {
+            question: "How much wood could a woodchuck chuck if a woodchuck could chuck wood?",
+            answers: [
+                {text: "yes", correct: false},
+                {text: "a woodchuck would chuck as much as a woodchuck could chuck if a woodchuck could chuck wood", correct: true},
+                {text: "what the hell is a woodchuck", correct: false},
+                {text: "there's no way a woodchuck could chuck wood so why would you ask", correct: false}
+            ]
+        },
+        {
+            question: "Is my grade skyrocketing after this so-called quiz?",
+            answers: [
+                {text: "yes", correct: false}, // please :)
+                {text: "Charles Darwin", correct: false}, // this is supposed to be completely random and therefore funny
+                {text: "absolutely not", correct: true}, 
+                {text: "PLEASE PROFESSOR V!", correct: false} // what other answers could there ever be
+            ]
+        },
+        {
+            question: "What is my dream dog breed?",
+            answers: [
+                {text: "woodchuck", correct: false}, // *cough cough*
+                {text: "australian shepherd", correct: true},
+                {text: "doberman pinscher", correct: false},
+                {text: "beagle", correct: false}
+            ]
+        },
+        {
+            question: "Why don't chickens wear pants?",
+            answers: [
+                {text: "because they're chickens", correct: false},
+                {text: "they'd rather cross in comfort", correct: false},
+                {text: "very small smooth brains", correct: false},
+                {text: "because their peckers are on their heads", correct: true} // South Park is funny for this one
+            ]
+        }
+    ];
+
+    const questionElement = document.getElementById("question");
+    const answerButtons = document.getElementById("answer-buttons");
+    const nextButton = document.getElementById("next-button");
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    function startQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        nextButton.innerHTML = "Next";
+        showQuestion();
+    }
+
+    function showQuestion() {
+        resetState();
+        let currentQuestion = questions[currentQuestionIndex];
+        let questionNo = currentQuestionIndex + 1;
+        questionElement.innerHTML = questionNo + ". " + currentQuestion.question
+
+        currentQuestion.answers.forEach(answer => {
+            const button = document.createElement("button");
+            button.innerHTML = answer.text;
+            button.classList.add("btn");
+            answerButtons.appendChild(button);
+            if(answer.correct) {
+                button.dataset.correct = answer.correct;
+            } 
+            button.addEventListener("click", selectAnswer);
+        });
+    }
+
+    function resetState() {
+        nextButton.style.display = "none";
+        while(answerButtons.firstChild){
+            answerButtons.removeChild(answerButtons.firstChild)
+        }
+    }
+
+    function selectAnswer(e){
+        const selectedBtn = e.target;
+        const isCorrect = selectedBtn.dataset.correct == "true";
+        if(isCorrect) {
+            selectedBtn.classList.add("correct");
+            score++;
+        }else{
+            selectedBtn.classList.add("incorrect");
+        }
+        Array.from(answerButtons.children).forEach(button => {
+            if(button.dataset.correct === "true"){
+                button.classList.add("correct");
+            }
+            button.disabled = true;
+        })
+        nextButton.style.display = "block";
+    }
+
+    function showScore(){
+        resetState();
+        questionElement.innerHTML = `You scored ${score} out of ${questions.length}!`;
+        nextButton.innerHTML = "Play again";
+        nextButton.style.display = "block";
+    }
+
+    function handleNextButton(){
+        currentQuestionIndex++;
+        if(currentQuestionIndex < questions.length){
+            showQuestion();
+        }else{
+            showScore();
+        }
+    }
+
+    nextButton.addEventListener("click", () => {
+        if(currentQuestionIndex < questions.length){
+            handleNextButton ();
+        }else{
+            startQuiz();
+        }
+    });
+</script>
+</body>
+</html>
